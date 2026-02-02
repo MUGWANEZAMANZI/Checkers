@@ -5,11 +5,11 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     [Header("Start Panel")]
-    public Panel startPanel;
+    public GameObject startPanel;
     public Button playButton;
 
     [Header("Game Over Panel")]
-    public Panel gameOverPanel;
+    public GameObject gameOverPanel;
     public TextMeshProUGUI gameOverText;
     public Button restartButton;
 
