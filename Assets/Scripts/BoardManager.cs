@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 public class BoardManager : MonoBehaviour
 {
     [Header("Board Settings")]
-    public int boardSize = 10;
+    public int boardSize = 8;
     public Tilemap tileMap;
     public TileBase darkTile;
     public TileBase lightTile;
@@ -87,13 +87,13 @@ public class BoardManager : MonoBehaviour
                     // Only spawn on playable squares
                     if ((x + y) % 2 != 0) 
                         {
-                        // Player Side (Bottom 4 rows)
-                            if (y < 4) 
+                        // Player Side (Bottom 3 rows)
+                            if (y < 3) 
                             {
                                 CreatePiece(x, y, playerPrefab, true);
                             }
-                            // AI Side (Top 4 rows)
-                            else if (y > 5) 
+                            // AI Side (Top 3 rows)
+                            else if (y > 4) 
                             {
                             CreatePiece(x, y, aiPrefab, false);
                              }

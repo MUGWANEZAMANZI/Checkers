@@ -21,6 +21,16 @@ public class UIManager : MonoBehaviour
     private int playerPiecesCount = 12;
     private int aiPiecesCount = 12;
 
+    [Header("Audio")]
+    public AudioClip playerKillSfx;
+    public AudioClip aiKillSfx;
+    public AudioClip dangerSfx;
+    public AudioClip[] backgroundMusic; // looping background music options
+
+    private AudioSource sfxSource;
+    private AudioSource musicSource;
+    private int musicIndex = 0;
+
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
@@ -38,6 +48,22 @@ public class UIManager : MonoBehaviour
 
         // Initialize UI
         UpdatePieceCounters(playerPiecesCount, aiPiecesCount);
+        // Initialize audio sources
+        sfxSource = gameObject.AddComponent<AudioSource>();
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.playOnAwake = false;
+        musicSource.loop = true;
+
+        if (backgroundMusic != null && backgroundMusic.Length > 0)
+        {
+            musicIndex = 0;
+            musicSource.clip = backgroundMusic[musicIndex];
+            musicSource.Play();
+            musicSource.volume = 0.5f;
+        }
         
         // Show start panel at game beginning
         if (startPanel != null)
@@ -104,12 +130,12 @@ public class UIManager : MonoBehaviour
 
         if (playerPiecesText != null)
         {
-            playerPiecesText.text = $"Player Pieces: {playerPiecesCount}";
+            playerPiecesText.text = $"Player: {playerPiecesCount}";
         }
 
         if (aiPiecesText != null)
         {
-            aiPiecesText.text = $"AI Pieces: {aiPiecesCount}";
+            aiPiecesText.text = $"AI: {aiPiecesCount}";
         }
 
         Debug.Log($"Pieces - Player: {playerPiecesCount} | AI: {aiPiecesCount}");
@@ -127,6 +153,27 @@ public class UIManager : MonoBehaviour
         else
         {
             aiPiecesCount--;
+        }
+
+        // Play appropriate SFX (use danger SFX when either side has less than 5 pieces)
+        AudioClip clipToPlay = null;
+        int remainingPlayer = playerPiecesCount;
+        int remainingAI = aiPiecesCount;
+
+        if (remainingPlayer < 5 || remainingAI < 5)
+        {
+            clipToPlay = dangerSfx;
+        }
+        else
+        {
+            // If the captured piece belongs to the player, AI killed a piece -> play aiKillSfx
+            // If the captured piece belongs to the AI, player killed a piece -> play playerKillSfx
+            clipToPlay = isPlayerPiece ? aiKillSfx : playerKillSfx;
+        }
+
+        if (clipToPlay != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clipToPlay);
         }
 
         UpdatePieceCounters(playerPiecesCount, aiPiecesCount);
@@ -147,8 +194,8 @@ public class UIManager : MonoBehaviour
         Debug.Log("Restart button clicked!");
         
         // Reset UI
-        playerPiecesCount = 12;
-        aiPiecesCount = 12;
+        playerPiecesCount = 20;
+        aiPiecesCount = 20;
         UpdatePieceCounters(playerPiecesCount, aiPiecesCount);
 
         if (startPanel != null)
@@ -159,6 +206,18 @@ public class UIManager : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.gameObject.SetActive(false);
+        }
+
+        // Restart background music if present
+        if (musicSource != null)
+        {
+            musicSource.Stop();
+            if (backgroundMusic != null && backgroundMusic.Length > 0)
+            {
+                musicIndex = 0;
+                musicSource.clip = backgroundMusic[musicIndex];
+                musicSource.Play();
+            }
         }
 
         // Reload scene or reset game state

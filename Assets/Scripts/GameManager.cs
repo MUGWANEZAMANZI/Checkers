@@ -85,6 +85,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    public void Musics()
+    {
+        
+    }
+
     public GameState GetCurrentState()
     {
         return currentState;
