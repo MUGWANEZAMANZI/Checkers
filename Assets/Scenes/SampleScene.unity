@@ -1673,9 +1673,9 @@ MonoBehaviour:
   restartButton: {fileID: 1796600849}
   playerPiecesText: {fileID: 1906671988}
   aiPiecesText: {fileID: 960402515}
-  playerKillSfx: {fileID: 0}
-  aiKillSfx: {fileID: 0}
-  dangerSfx: {fileID: 0}
+  playerKillSfx: {fileID: 8300000, guid: 32d4b1811dda14a6cb9e059ee8ad17d2, type: 3}
+  aiKillSfx: {fileID: 8300000, guid: dc6614beca09347ec9b258f12d154bdd, type: 3}
+  dangerSfx: {fileID: 8300000, guid: 38a17a92b9d9748c6a1e67972041b833, type: 3}
   backgroundMusic: []
 --- !u!1 &1671138979
 GameObject:
