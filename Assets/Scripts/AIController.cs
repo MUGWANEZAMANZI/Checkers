@@ -15,6 +15,7 @@ public class AIController : MonoBehaviour
         public bool isCapture;
         public int captureCount;
         public int evaluationScore; // Heuristic score for this move
+        public System.Collections.Generic.List<Vector2Int> capturedPositions;
     }
 
     void Start()
@@ -111,17 +112,63 @@ public class AIController : MonoBehaviour
                         CheckerPiece capturedScript = capturedPiece.GetComponent<CheckerPiece>();
                         if (capturedScript != null && capturedScript.isPlayerPiece)
                         {
-                            allValidMoves.Add(new MoveData 
-                            { 
-                                from = pos, 
-                                to = jumpPos, 
+                            var md = new MoveData
+                            {
+                                from = pos,
+                                to = jumpPos,
                                 isCapture = true,
-                                captureCount = 1
-                            });
+                                captureCount = 1,
+                                capturedPositions = new System.Collections.Generic.List<Vector2Int> { capturedPos }
+                            };
+                            allValidMoves.Add(md);
+                            // Also explore multi-jump sequences starting from this landing
+                            FindRegularCaptures(pos, jumpPos, md.capturedPositions);
                         }
                     }
                 }
             }
+        }
+    }
+
+    // Explore multi-jump sequences for regular (non-king) pieces using DFS
+    private void FindRegularCaptures(Vector2Int startPos, Vector2Int currentPos, System.Collections.Generic.List<Vector2Int> capturedSoFar)
+    {
+        Vector2Int[] jumpDirs = new[] { new Vector2Int(2, 2), new Vector2Int(2, -2), new Vector2Int(-2, 2), new Vector2Int(-2, -2) };
+
+        bool extended = false;
+
+        foreach (var jumpDir in jumpDirs)
+        {
+            Vector2Int landing = currentPos + jumpDir;
+            if (!IsWithinBounds(landing)) continue;
+            // landing must be empty and valid
+            if (!boardManager.isValidMove(currentPos, landing)) continue;
+
+            Vector2Int mid = currentPos + new Vector2Int(jumpDir.x / 2, jumpDir.y / 2);
+            GameObject midPiece = boardManager.grids[mid.x, mid.y].occupant;
+            if (midPiece == null) continue;
+            CheckerPiece midScript = midPiece.GetComponent<CheckerPiece>();
+            if (midScript == null || !midScript.isPlayerPiece) continue; // must capture player pieces
+
+            // avoid capturing same piece twice in a sequence
+            if (capturedSoFar.Contains(mid)) continue;
+
+            extended = true;
+            var newCaptured = new System.Collections.Generic.List<Vector2Int>(capturedSoFar) { mid };
+
+            var md = new MoveData
+            {
+                from = startPos,
+                to = landing,
+                isCapture = true,
+                captureCount = newCaptured.Count,
+                capturedPositions = new System.Collections.Generic.List<Vector2Int>(newCaptured)
+            };
+
+            allValidMoves.Add(md);
+
+            // recurse to find further captures from landing
+            FindRegularCaptures(startPos, landing, newCaptured);
         }
     }
     
@@ -174,7 +221,8 @@ public class AIController : MonoBehaviour
                         from = startPos,
                         to = currentPos,
                         isCapture = true,
-                        captureCount = capturedPositions.Count
+                        captureCount = capturedPositions.Count,
+                        capturedPositions = new System.Collections.Generic.List<Vector2Int>(capturedPositions)
                     });
                 }
                 consecutiveEnemies = 0;
@@ -411,52 +459,44 @@ public class AIController : MonoBehaviour
         movingPiece.transform.position = boardManager.tileMap.GetCellCenterWorld(
             new Vector3Int(to.x, to.y, 0));
 
-        // Handle capture
+        // Handle capture: if MoveData contains capturedPositions, remove them all (works for multi-jump and king captures)
         if (moveData.isCapture)
         {
-            CheckerPiece movedPieceScript = movingPiece.GetComponent<CheckerPiece>();
-            
-            if (movedPieceScript != null && movedPieceScript.isKing && moveData.captureCount > 1)
+            if (moveData.capturedPositions != null && moveData.capturedPositions.Count > 0)
             {
-                // King multi-capture: capture all pieces along the diagonal
-                Vector2Int direction = (to - from);
-                direction.x = direction.x > 0 ? 1 : (direction.x < 0 ? -1 : 0);
-                direction.y = direction.y > 0 ? 1 : (direction.y < 0 ? -1 : 0);
-                
-                Vector2Int capturePos = from + direction;
-                int capturesRemaining = moveData.captureCount;
-                
-                while (capturesRemaining > 0 && boardManager.grids[capturePos.x, capturePos.y].occupant != null)
+                foreach (var capPos in moveData.capturedPositions)
                 {
-                    GameObject capturedPiece = boardManager.grids[capturePos.x, capturePos.y].occupant;
-                    CheckerPiece capturedScript = capturedPiece.GetComponent<CheckerPiece>();
-                    
-                    if (capturedScript != null && capturedScript.isPlayerPiece)
+                    if (!IsWithinBounds(capPos)) continue;
+                    GameObject capturedPiece = boardManager.grids[capPos.x, capPos.y].occupant;
+                    if (capturedPiece != null)
                     {
-                        capturedScript.Capture();
-                        gameManager.OnPiecesCaptured(1, false);
-                        boardManager.grids[capturePos.x, capturePos.y].occupant = null;
-                        capturesRemaining--;
+                        CheckerPiece capturedScript = capturedPiece.GetComponent<CheckerPiece>();
+                        if (capturedScript != null && capturedScript.isPlayerPiece)
+                        {
+                            capturedScript.Capture();
+                            gameManager.OnPiecesCaptured(1, false);
+                        }
+                        boardManager.grids[capPos.x, capPos.y].occupant = null;
                     }
-                    
-                    capturePos += direction;
                 }
             }
             else
             {
-                // Regular single capture
+                // Fallback: single capture between from and to
                 Vector2Int capturedPos = (from + to) / 2;
-                GameObject capturedPiece = boardManager.grids[capturedPos.x, capturedPos.y].occupant;
-
-                if (capturedPiece != null)
+                if (IsWithinBounds(capturedPos))
                 {
-                    CheckerPiece capturedScript = capturedPiece.GetComponent<CheckerPiece>();
-                    if (capturedScript != null)
+                    GameObject capturedPiece = boardManager.grids[capturedPos.x, capturedPos.y].occupant;
+                    if (capturedPiece != null)
                     {
-                        capturedScript.Capture();
-                        gameManager.OnPiecesCaptured(1, false);
+                        CheckerPiece capturedScript = capturedPiece.GetComponent<CheckerPiece>();
+                        if (capturedScript != null)
+                        {
+                            capturedScript.Capture();
+                            gameManager.OnPiecesCaptured(1, false);
+                        }
+                        boardManager.grids[capturedPos.x, capturedPos.y].occupant = null;
                     }
-                    boardManager.grids[capturedPos.x, capturedPos.y].occupant = null;
                 }
             }
         }

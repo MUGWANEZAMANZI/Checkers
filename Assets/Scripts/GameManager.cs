@@ -63,12 +63,15 @@ public class GameManager : MonoBehaviour
         
         Debug.Log($"Player Score: {playerScore} | AI Score: {aiScore}");
         
-        // Update UI piece counters
+        // Notify UI manager so it can play SFX and update its internal counters
         if (uiManager != null)
         {
-            int playerPieces = 12 - aiScore; // Total player pieces minus captured
-            int aiPieces = 12 - playerScore; // Total AI pieces minus captured
-            uiManager.UpdatePieceCounters(playerPieces, aiPieces);
+            // uiManager.OnPieceCaptured expects `isPlayerPiece` (true if the captured piece belonged to the player)
+            bool capturedIsPlayerPiece = !isPlayer; // if capture was by player, captured piece is AI
+            for (int i = 0; i < count; i++)
+            {
+                uiManager.OnPieceCaptured(capturedIsPlayerPiece);
+            }
         }
     }
 

@@ -52,6 +52,22 @@ public class UIManager : MonoBehaviour
         sfxSource = gameObject.AddComponent<AudioSource>();
         sfxSource.playOnAwake = false;
         sfxSource.loop = false;
+        sfxSource.volume = 1.0f; // make SFX loud by default
+
+        // Debug: ensure AudioListener exists (no audio will be heard without one)
+        if (FindObjectOfType<AudioListener>() == null)
+        {
+            Camera mainCam = Camera.main;
+            if (mainCam != null)
+            {
+                mainCam.gameObject.AddComponent<AudioListener>();
+                Debug.Log("UIManager: No AudioListener found - added one to Main Camera.");
+            }
+            else
+            {
+                Debug.LogWarning("UIManager: No AudioListener found and no Main Camera to attach to.");
+            }
+        }
 
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.playOnAwake = false;
@@ -61,8 +77,9 @@ public class UIManager : MonoBehaviour
         {
             musicIndex = 0;
             musicSource.clip = backgroundMusic[musicIndex];
+            musicSource.volume = 0.08f; // keep background music very low
             musicSource.Play();
-            musicSource.volume = 0.5f;
+            Debug.Log($"UIManager: Started background music (index {musicIndex}) at volume {musicSource.volume}");
         }
         
         // Show start panel at game beginning
@@ -130,7 +147,7 @@ public class UIManager : MonoBehaviour
 
         if (playerPiecesText != null)
         {
-            playerPiecesText.text = $"Player: {playerPiecesCount}";
+            playerPiecesText.text = $"You: {playerPiecesCount}";
         }
 
         if (aiPiecesText != null)
@@ -173,7 +190,10 @@ public class UIManager : MonoBehaviour
 
         if (clipToPlay != null && sfxSource != null)
         {
-            sfxSource.PlayOneShot(clipToPlay);
+            // Boost volume for kill SFX to make captures feel impactful
+            float scale = (clipToPlay == playerKillSfx || clipToPlay == aiKillSfx) ? 1.8f : 1.0f;
+            Debug.Log($"UIManager: Playing SFX {clipToPlay.name} scale={scale} sourceVol={sfxSource.volume}");
+            sfxSource.PlayOneShot(clipToPlay, scale);
         }
 
         UpdatePieceCounters(playerPiecesCount, aiPiecesCount);
@@ -194,8 +214,8 @@ public class UIManager : MonoBehaviour
         Debug.Log("Restart button clicked!");
         
         // Reset UI
-        playerPiecesCount = 20;
-        aiPiecesCount = 20;
+        playerPiecesCount = 12;
+        aiPiecesCount = 12;
         UpdatePieceCounters(playerPiecesCount, aiPiecesCount);
 
         if (startPanel != null)
@@ -216,6 +236,7 @@ public class UIManager : MonoBehaviour
             {
                 musicIndex = 0;
                 musicSource.clip = backgroundMusic[musicIndex];
+                musicSource.volume = 0.08f; // re-apply low music volume on restart
                 musicSource.Play();
             }
         }

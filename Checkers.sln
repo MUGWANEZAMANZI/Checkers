@@ -1,7 +1,8 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.2.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{653C4D46-4EF4-D168-E6D6-6199E72F48EE}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{50A17DA1-3556-4046-CEDC-33EB466D9C32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PackageCache", "PackageCache", "{C5C0596F-4AD5-7F56-9391-3083F761A456}"
@@ -18,6 +19,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{653C4D46-4EF4-D168-E6D6-6199E72F48EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653C4D46-4EF4-D168-E6D6-6199E72F48EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653C4D46-4EF4-D168-E6D6-6199E72F48EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653C4D46-4EF4-D168-E6D6-6199E72F48EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{412207D2-8321-33A0-A9A5-5B0D2B438182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{412207D2-8321-33A0-A9A5-5B0D2B438182}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{412207D2-8321-33A0-A9A5-5B0D2B438182}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -31,8 +36,5 @@ Global
 		{4B45C7B9-783B-1220-72EA-0911CC74A2B1} = {C5C0596F-4AD5-7F56-9391-3083F761A456}
 		{BC9720D9-5A0B-8E25-7102-BF428010140A} = {4B45C7B9-783B-1220-72EA-0911CC74A2B1}
 		{412207D2-8321-33A0-A9A5-5B0D2B438182} = {BC9720D9-5A0B-8E25-7102-BF428010140A}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B7157267-473F-4D11-B48A-2299DA0B55F7}
 	EndGlobalSection
 EndGlobal
