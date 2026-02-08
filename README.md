@@ -1,6 +1,6 @@
 # Checkers — Unit 6
 
-This README explains how to clone and open the project (Unit 6) in Unity, minimal third-party package expectations, and a short overview of programming principles and heuristics used to make gameplay smooth.
+This README explains how to clone and open the project (Unity 6) in Unity, minimal third-party package expectations, and a short overview of programming principles and heuristics used to make gameplay smooth.
 
 ## Required Unity Version
 - Project was created with Unity 2023.4 (Editor version: 6000.0.66f1). Use the same or a compatible LTS release (2023.4.x recommended) in Unity Hub.
@@ -22,12 +22,12 @@ Unity will import assets and compile scripts. Wait for the Editor to finish the 
 ## Minimal third-party packages
 This project uses Unity built-in features and minimal external packages. Confirm the following packages (if any) in `Packages/manifest.json`:
 - `com.unity.textmeshpro` (TextMeshPro) — necessary for UI text.
-- Input System: if the project uses the new Input System, enable it in Player Settings or install `com.unity.inputsystem`.
+- Input System: The project uses the new Input System, enable it in Player Settings or install `com.unity.inputsystem`.
 
 If any package is missing Unity will prompt to install it when the project opens. No other third-party assets are required for core gameplay.
 
 ## Quick-run steps
-1. Open the scene used for the game. Look under `Assets/Scenes` — open the main scene (e.g., `Main` or `SampleScene`).
+1. Open the scene used for the game. Look under `Assets/Scenes` — open the `SampleScene`.
 2. Inspect the `GameManager` (on the root GameObject or `GameManager` prefab) to ensure `AIController`, `PlayerController`, and `UIManager` are present.
 3. In the `UIManager` inspector, assign SFX and background music clips (optional) and the UI `TextMeshProUGUI` references for the piece counters.
 4. Press Play. Use the Start/Play button to begin the game.
@@ -83,6 +83,3 @@ The project focuses on clarity and responsiveness. Key practices applied:
 - Volumes: `UIManager` exposes volume scaling in code; consider exposing public fields for `musicVolume` and `sfxVolume` to tweak in the Inspector.
 - Add an options menu with runtime sliders for master/music/SFX volumes.
 - Improve AI by adding limited-depth lookahead or alpha-beta pruning for stronger play.
-
----
-If you want, I can add a small `Options` scene with volume sliders and persist settings, or make `UIManager` expose public `musicVolume`/`sfxVolume` fields for Inspector tweaks. Which would you prefer?
