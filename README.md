@@ -1,4 +1,4 @@
-# Checkers — Unit 6
+# Checkers made with Unity 6
 
 This README explains how to clone and open the project (Unity 6) in Unity, minimal third-party package expectations, and a short overview of programming principles and heuristics used to make gameplay smooth.
 
